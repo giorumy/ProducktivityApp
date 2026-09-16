@@ -1,0 +1,12 @@
+1. Account login 
+2. Key and password storage
+3. basic user profile
+4. User and Admin access
+5. Way to create tasks
+6. Track tasks
+7. Add value to each tasks
+8. Way to check others profiles
+9. Interact with other users
+10. Create main pet
+11. way to track "Health" of pet
+12. Reoccuring tasks
