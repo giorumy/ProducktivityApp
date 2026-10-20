@@ -1,0 +1,297 @@
+@import url("https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600&family=Atkinson+Hyperlegible:wght@400;700&display=swap");
+
+/* Covers the whole window so the page isn't squeezed by the #root styles in index.css */
+.auth {
+  --pond: #1f5e63;
+  --pond-light: #2c7c80;
+  --shallows: #cfe8e4;
+  --bill: #f2a33a;
+  --paper: #f7faf8;
+  --ink: #1a2b2c;
+  --muted: #5a6f70;
+  --danger: #b3261e;
+
+  position: fixed;
+  inset: 0;
+  overflow-y: auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  color-scheme: light;
+  font-family: "Atkinson Hyperlegible", system-ui, sans-serif;
+  font-size: 16px;
+  line-height: 1.45;
+  letter-spacing: normal;
+  text-align: left;
+  color: var(--ink);
+  background: var(--paper);
+}
+
+/* ---------- Pond side ---------- */
+.auth__pond {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 100%;
+  overflow: hidden;
+  background: var(--pond);
+  color: var(--paper);
+}
+
+.auth__pond-text {
+  padding: 3rem 3.5rem 0;
+}
+
+.auth__brand {
+  margin: 0 0 2.5rem;
+  font-family: "Fredoka", sans-serif;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--shallows);
+}
+
+.auth__motto {
+  margin: 0;
+  font-family: "Fredoka", sans-serif;
+  font-size: clamp(3rem, 6vw, 5.25rem);
+  font-weight: 600;
+  line-height: 0.98;
+}
+
+.auth__water {
+  position: relative;
+  height: 9rem;
+}
+
+.auth__waves {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  height: 6rem;
+}
+
+.auth__duck {
+  position: absolute;
+  left: 3.5rem;
+  bottom: 3.6rem;
+  width: 7rem;
+  z-index: 1;
+  animation: auth-bob 3.2s ease-in-out infinite;
+}
+
+@keyframes auth-bob {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-6px) rotate(-2deg); }
+}
+
+/* ---------- Form side ---------- */
+.auth__panel {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2.5rem 2rem;
+}
+
+.auth__form {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 24rem;
+}
+
+.auth__title {
+  margin: 0;
+  font-family: "Fredoka", sans-serif;
+  font-size: 2.25rem;
+  font-weight: 600;
+  letter-spacing: normal;
+  line-height: 1.1;
+  color: var(--ink);
+}
+
+.auth__subtitle {
+  margin: 0.4rem 0 1.75rem;
+  color: var(--muted);
+}
+
+.auth__form-error {
+  margin: 0 0 1.25rem;
+  padding: 0.75rem 1rem;
+  border-left: 4px solid var(--danger);
+  border-radius: 4px;
+  background: #fbeceb;
+  color: var(--danger);
+  font-size: 0.95rem;
+}
+
+.auth__field {
+  margin-bottom: 1.1rem;
+}
+
+.auth__label {
+  display: block;
+  margin-bottom: 0.4rem;
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+
+.auth__input-wrap {
+  position: relative;
+}
+
+.auth__input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0.8rem 1rem;
+  border: 2px solid var(--shallows);
+  border-radius: 10px;
+  background: #fff;
+  font: inherit;
+  color: var(--ink);
+  transition: border-color 0.15s;
+}
+
+.auth__input--with-trailing {
+  padding-right: 4.5rem;
+}
+
+.auth__input:focus {
+  border-color: var(--pond-light);
+}
+
+.auth__input[aria-invalid="true"] {
+  border-color: var(--danger);
+}
+
+.auth__hint,
+.auth__error {
+  margin: 0.35rem 0 0;
+  font-size: 0.85rem;
+}
+
+.auth__hint {
+  color: var(--muted);
+}
+
+.auth__error {
+  color: var(--danger);
+  font-weight: 700;
+}
+
+.auth__toggle {
+  position: absolute;
+  top: 50%;
+  right: 0.5rem;
+  transform: translateY(-50%);
+  padding: 0.35rem 0.6rem;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--pond);
+  cursor: pointer;
+}
+
+.auth__toggle:hover {
+  background: var(--shallows);
+}
+
+.auth__submit {
+  margin-top: 0.6rem;
+  padding: 0.9rem;
+  border: none;
+  border-radius: 999px;
+  background: var(--bill);
+  font-family: "Fredoka", sans-serif;
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: var(--ink);
+  cursor: pointer;
+  transition: transform 0.1s, filter 0.15s;
+}
+
+.auth__submit:hover:not(:disabled) {
+  filter: brightness(1.05);
+}
+
+.auth__submit:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.auth__submit:disabled {
+  opacity: 0.65;
+  cursor: wait;
+}
+
+.auth__switch {
+  margin: 1.5rem 0 0;
+  text-align: center;
+  color: var(--muted);
+}
+
+.auth__link {
+  padding: 0;
+  border: none;
+  background: none;
+  font: inherit;
+  font-weight: 700;
+  color: var(--pond);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.auth :focus-visible {
+  outline: 3px solid var(--bill);
+  outline-offset: 2px;
+}
+
+/* ---------- Phones: pond becomes a short band on top ---------- */
+@media (max-width: 800px) {
+  .auth {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 1fr;
+  }
+
+  .auth__pond {
+    min-height: 0;
+  }
+
+  .auth__pond-text {
+    padding: 1.5rem 1.5rem 0;
+  }
+
+  .auth__brand {
+    margin-bottom: 0.75rem;
+  }
+
+  .auth__motto {
+    font-size: 2.25rem;
+  }
+
+  .auth__water {
+    height: 5.5rem;
+  }
+
+  .auth__waves {
+    height: 3.5rem;
+  }
+
+  .auth__duck {
+    left: 1.5rem;
+    bottom: 1.9rem;
+    width: 4.5rem;
+  }
+
+  .auth__panel {
+    align-items: flex-start;
+    padding: 2rem 1.5rem 3rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .auth__duck {
+    animation: none;
+  }
+}
