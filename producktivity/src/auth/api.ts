@@ -7,9 +7,9 @@
 // Errors should come back as { "error": "message", "field": "username" | "email" }
 // with status 401 (wrong login) or 409 (username/email already taken).
 
-export const USE_MOCK = true;
+export const USE_MOCK = false;
 
-const API_URL = import.meta.env.VITE_API_URL ?? "http://localhost:5000";
+const API_URL = import.meta.env.VITE_API_URL ?? "http://localhost:5001";
 
 export interface User {
   id: string;
