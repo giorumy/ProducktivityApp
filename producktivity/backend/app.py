@@ -5,6 +5,9 @@ from flask_cors import CORS
 
 from auth import auth_bp
 
+from bson import ObjectId
+from bson.errors import InvalidId
+
 
 def create_app(database=None):
     app = Flask(__name__)
@@ -42,6 +45,77 @@ def create_app(database=None):
             for t in database.tasks.find()
         ]
         return jsonify(tasks)
+    
+
+    @app.get("/tasks/<task_id>")
+    def get_task(task_id):
+        try:
+            task = database.tasks.find_one({"_id": ObjectId(task_id)})
+        except InvalidId:
+            return {"error": "Invalid task ID"}, 400
+
+        if task is None:
+            return {"error": "Task not found"}, 404
+
+        return {
+            "id": str(task["_id"]),
+            "title": task["title"],
+            "completed": task["completed"]
+        }
+
+    @app.patch("/tasks/<task_id>")
+    def update_task(task_id):
+        data = request.get_json(silent=True) or {}
+
+        updates = {}
+
+        if "title" in data:
+            if not isinstance(data["title"], str) or not data["title"].strip():
+                return {"error": "title cannot be empty"}, 400
+            updates["title"] = data["title"].strip()
+
+        if "completed" in data:
+            if not isinstance(data["completed"], bool):
+                return {"error": "completed must be a boolean"}, 400
+            updates["completed"] = data["completed"]
+
+        if not updates:
+            return {"error": "No valid fields to update"}, 400
+
+        try:
+            task_id_obj = ObjectId(task_id)
+        except InvalidId:
+            return {"error": "Invalid task ID"}, 400
+
+        result = database.tasks.update_one(
+            {"_id": task_id_obj},
+            {"$set": updates}
+        )
+
+        if result.matched_count == 0:
+            return {"error": "Task not found"}, 404
+
+        task = database.tasks.find_one({"_id": task_id_obj})
+
+        return {
+            "id": str(task["_id"]),
+            "title": task["title"],
+            "completed": task["completed"]
+        }
+
+    @app.delete("/tasks/<task_id>")
+    def delete_task(task_id):
+        try:
+            task_id_obj = ObjectId(task_id)
+        except InvalidId:
+            return {"error": "Invalid task ID"}, 400
+
+        result = database.tasks.delete_one({"_id": task_id_obj})
+
+        if result.deleted_count == 0:
+            return {"error": "Task not found"}, 404
+
+        return {"message": "Task deleted successfully"}, 200
 
     return app
 
