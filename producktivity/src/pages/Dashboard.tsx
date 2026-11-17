@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import type { FormEvent } from "react";
+import { createTask, deleteTask, listTasks, updateTask } from "../tasks/api";
 import "./Dashboard.css";
 
 export interface Task {
@@ -31,7 +32,18 @@ export default function Dashboard({ onSignOut, username, initialTasks = [] }: Da
   const [editText, setEditText] = useState("");
   const undoTimer = useRef<number | undefined>(undefined);
 
-  useEffect(() => () => window.clearTimeout(undoTimer.current), []);
+  useEffect(() => {
+    let active = true;
+    listTasks()
+      .then((loadedTasks) => {
+        if (active) setTasks(loadedTasks);
+      })
+      .catch(() => {});
+    return () => {
+      active = false;
+      window.clearTimeout(undoTimer.current);
+    };
+  }, []);
 
   const completedCount = tasks.filter((g) => g.completed).length;
   const percent = tasks.length === 0 ? 0 : Math.round((completedCount / tasks.length) * 100);
@@ -43,12 +55,20 @@ export default function Dashboard({ onSignOut, username, initialTasks = [] }: Da
     e.preventDefault();
     const title = draft.trim();
     if (!title) return;
-    setTasks((prev) => [...prev, { id: crypto.randomUUID(), title, completed: false }]);
     setDraft("");
+    createTask(title)
+      .then((task) => setTasks((prev) => [...prev, task]))
+      .catch(() => setDraft(title));
   }
 
   function toggleTask(id: string) {
-    setTasks((prev) => prev.map((g) => (g.id === id ? { ...g, completed: !g.completed } : g)));
+    const task = tasks.find((item) => item.id === id);
+    if (!task) return;
+    const completed = !task.completed;
+    setTasks((prev) => prev.map((item) => (item.id === id ? { ...item, completed } : item)));
+    updateTask(id, { completed }).catch(() => {
+      setTasks((prev) => prev.map((item) => (item.id === id ? { ...item, completed: task.completed } : item)));
+    });
   }
 
   function startEdit(task: Task) {
@@ -59,9 +79,15 @@ export default function Dashboard({ onSignOut, username, initialTasks = [] }: Da
   function saveEdit(id: string) {
     const title = editText.trim();
     if (!title) return;
-    setTasks((prev) => prev.map((t) => (t.id === id ? { ...t, title } : t)));
+    const previous = tasks.find((task) => task.id === id)?.title;
     setEditingId(null);
     setEditText("");
+    setTasks((prev) => prev.map((task) => (task.id === id ? { ...task, title } : task)));
+    updateTask(id, { title }).catch(() => {
+      setTasks((prev) => prev.map((task) => (
+        task.id === id && previous !== undefined ? { ...task, title: previous } : task
+      )));
+    });
   }
 
   function cancelEdit() {
@@ -74,6 +100,14 @@ export default function Dashboard({ onSignOut, username, initialTasks = [] }: Da
     if (index === -1) return;
     setRemoved({ task: tasks[index], index });
     setTasks((prev) => prev.filter((g) => g.id !== id));
+    deleteTask(id).catch(() => {
+      setTasks((prev) => {
+        const next = [...prev];
+        next.splice(Math.min(index, next.length), 0, tasks[index]);
+        return next;
+      });
+      setRemoved(null);
+    });
     window.clearTimeout(undoTimer.current);
     undoTimer.current = window.setTimeout(() => setRemoved(null), UNDO_WINDOW_MS);
   }
@@ -81,11 +115,15 @@ export default function Dashboard({ onSignOut, username, initialTasks = [] }: Da
   function undoRemove() {
     if (!removed) return;
     const { task, index } = removed;
-    setTasks((prev) => {
-      const next = [...prev];
-      next.splice(Math.min(index, next.length), 0, task);
-      return next;
-    });
+    createTask(task.title, task.completed)
+      .then((restored) => setTasks((prev) => {
+        const next = [...prev];
+        next.splice(Math.min(index, next.length), 0, restored);
+        return next;
+      }))
+      .catch(() => {});
+    setRemoved(null);
+    window.clearTimeout(undoTimer.current);
     setRemoved(null);
     window.clearTimeout(undoTimer.current);
   }
